@@ -44,7 +44,7 @@
       },
       "sync": {
         "title": "Synchronisation du parking simulé",
-        "description": "Parking : {parking}. {count} bornes virtuelles seront créées ou mises à jour dans une configuration dédiée du module Pilotage recharge VE. Les configurations physiques ne seront jamais modifiées. Les bornes absentes de ce lot ne sont pas supprimées.",
+        "description": "Parking : {parking}. Bornes au total : {count}. À ajouter : {new_count}. À actualiser : {updated_count}. Compteurs virtuels : L1 = {meter_l1}, L2 = {meter_l2}, L3 = {meter_l3}. Une installation de test dédiée sera créée ou synchronisée. Les installations physiques et les autres sous-entrées ne seront jamais modifiées.",
         "data": {
           "confirm": "Je confirme la création ou la mise à jour de l'installation de test."
         }
