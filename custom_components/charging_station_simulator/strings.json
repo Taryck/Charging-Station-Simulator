@@ -1,0 +1,101 @@
+{
+  "title": "Charging Station Simulator",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Create simulated parking",
+        "data": {
+          "name": "Parking name",
+          "count": "Number of charging stations",
+          "time_factor": "Energy time multiplier",
+          "trip_delay": "Maximum continuous overload duration (s)",
+          "seed": "Random seed",
+          "limit_l1": "Phase L1 current limit (A)",
+          "limit_l2": "Phase L2 current limit (A)",
+          "limit_l3": "Phase L3 current limit (A)"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Modify simulated parking",
+        "data": {
+          "name": "Parking name",
+          "count": "Number of charging stations",
+          "time_factor": "Energy time multiplier",
+          "trip_delay": "Maximum continuous overload duration (s)",
+          "seed": "Random seed",
+          "limit_l1": "Phase L1 current limit (A)",
+          "limit_l2": "Phase L2 current limit (A)",
+          "limit_l3": "Phase L3 current limit (A)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "total_current": {
+        "name": "Total {phase} current"
+      },
+      "charger_current": {
+        "name": "Charger {index} {phase} current"
+      },
+      "energy": {
+        "name": "Charger {index} energy"
+      },
+      "charger_status": {
+        "name": "Charger {index} status"
+      },
+      "parking_status": {
+        "name": "Parking status"
+      }
+    },
+    "number": {
+      "setpoint": {
+        "name": "Charger {index} current setpoint"
+      },
+      "starting_current": {
+        "name": "Charger {index} starting current"
+      },
+      "hardware_min": {
+        "name": "Charger {index} hardware minimum"
+      },
+      "hardware_max": {
+        "name": "Charger {index} hardware maximum"
+      },
+      "target_kwh": {
+        "name": "Charger {index} energy target"
+      }
+    },
+    "select": {
+      "command": {
+        "name": "Charger {index} command"
+      },
+      "mode": {
+        "name": "Charger {index} phase mode"
+      },
+      "scenario": {
+        "name": "Test scenario"
+      }
+    },
+    "button": {
+      "start": {
+        "name": "Start charger {index}"
+      },
+      "start_all": {
+        "name": "Start all chargers"
+      },
+      "stop_all": {
+        "name": "Stop all chargers"
+      },
+      "reset_trip": {
+        "name": "Reset virtual trip"
+      },
+      "load_scenario": {
+        "name": "Load scenario"
+      }
+    }
+  }
+}

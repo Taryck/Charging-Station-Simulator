@@ -1,0 +1,11 @@
+{
+  "description": "Sample cases for simulation tests; no household load is included",
+  "cases": [
+    {"name": "balanced", "count": 10, "mode": "tri", "target_kwh": 20, "limit_l1": 60, "limit_l2": 60, "limit_l3": 60},
+    {"name": "mono_mix", "count": 10, "modes": ["l1", "l2", "l3", "tri"], "target_kwh": 25},
+    {"name": "overload_two_phases", "count": 10, "phases": ["l1", "l2"], "starting_current_a": 22, "limit_a": 35},
+    {"name": "wrong_minimum", "count": 10, "hardware_min_a": [6, 6, 12], "pilot_min_a": 6, "expected": "refusal_then_stop"},
+    {"name": "short_sessions", "count": 10, "target_kwh": [0.15, 0.25, 0.35], "expected": "current_zero_after_completion"},
+    {"name": "random", "count": 10, "seed": 12345, "target_kwh_range": [5, 40]}
+  ]
+}

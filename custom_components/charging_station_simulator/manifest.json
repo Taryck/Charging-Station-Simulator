@@ -1,0 +1,12 @@
+{
+  "domain": "charging_station_simulator",
+  "name": "Charging Station Simulator",
+  "version": "0.1.0",
+  "documentation": "https://github.com/Taryck/Charging-Station-Simulator",
+  "issue_tracker": "https://github.com/Taryck/Charging-Station-Simulator/issues",
+  "codeowners": [],
+  "config_flow": true,
+  "integration_type": "hub",
+  "iot_class": "local_push",
+  "requirements": []
+}

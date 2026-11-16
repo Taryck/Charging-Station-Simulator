@@ -1,0 +1,101 @@
+{
+  "title": "Simulateur de bornes de recharge",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Créer un parking simulé",
+        "data": {
+          "name": "Nom du parking",
+          "count": "Nombre de bornes",
+          "time_factor": "Multiplicateur du temps pour l’énergie",
+          "trip_delay": "Durée maximale de dépassement continu (s)",
+          "seed": "Graine aléatoire",
+          "limit_l1": "Seuil de courant L1 (A)",
+          "limit_l2": "Seuil de courant L2 (A)",
+          "limit_l3": "Seuil de courant L3 (A)"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Modifier le parking simulé",
+        "data": {
+          "name": "Nom du parking",
+          "count": "Nombre de bornes",
+          "time_factor": "Multiplicateur du temps pour l’énergie",
+          "trip_delay": "Durée maximale de dépassement continu (s)",
+          "seed": "Graine aléatoire",
+          "limit_l1": "Seuil de courant L1 (A)",
+          "limit_l2": "Seuil de courant L2 (A)",
+          "limit_l3": "Seuil de courant L3 (A)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "total_current": {
+        "name": "Courant total {phase}"
+      },
+      "charger_current": {
+        "name": "Courant borne {index} {phase}"
+      },
+      "energy": {
+        "name": "Énergie borne {index}"
+      },
+      "charger_status": {
+        "name": "État borne {index}"
+      },
+      "parking_status": {
+        "name": "État du parking"
+      }
+    },
+    "number": {
+      "setpoint": {
+        "name": "Consigne borne {index}"
+      },
+      "starting_current": {
+        "name": "Courant initial borne {index}"
+      },
+      "hardware_min": {
+        "name": "Minimum matériel borne {index}"
+      },
+      "hardware_max": {
+        "name": "Maximum matériel borne {index}"
+      },
+      "target_kwh": {
+        "name": "Énergie cible borne {index}"
+      }
+    },
+    "select": {
+      "command": {
+        "name": "Commande borne {index}"
+      },
+      "mode": {
+        "name": "Mode des phases borne {index}"
+      },
+      "scenario": {
+        "name": "Scénario de test"
+      }
+    },
+    "button": {
+      "start": {
+        "name": "Démarrer la borne {index}"
+      },
+      "start_all": {
+        "name": "Démarrer toutes les bornes"
+      },
+      "stop_all": {
+        "name": "Arrêter toutes les bornes"
+      },
+      "reset_trip": {
+        "name": "Réarmer la coupure virtuelle"
+      },
+      "load_scenario": {
+        "name": "Charger le scénario"
+      }
+    }
+  }
+}
