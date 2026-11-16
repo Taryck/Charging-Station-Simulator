@@ -44,7 +44,7 @@
       },
       "sync": {
         "title": "Synchronize simulated parking",
-        "description": "Parking: {parking}. {count} virtual chargers will be created or updated in a dedicated EV Load Manager test installation. Physical configurations are never modified. Missing chargers are not automatically deleted.",
+        "description": "Parking: {parking}. Total chargers: {count}. To add: {new_count}. To update: {updated_count}. Virtual meters: L1 = {meter_l1}, L2 = {meter_l2}, L3 = {meter_l3}. A dedicated test installation will be created or synchronized. Physical installations and unrelated subentries will never be modified.",
         "data": {
           "confirm": "I confirm creation or update of the test installation."
         }
