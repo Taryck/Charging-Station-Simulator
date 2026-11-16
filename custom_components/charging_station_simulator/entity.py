@@ -12,7 +12,7 @@ class SimEntity:
         self.charger = charger
         self._attr_unique_id = f"{runtime.entry.entry_id}_{suffix}"
         self._attr_name = None
-        self._attr_suggested_object_id = label.lower().replace(" ", "_")
+        self._attr_suggested_object_id = f"ev_sim_{suffix}"
 
     async def async_added_to_hass(self):
         await super().async_added_to_hass()
