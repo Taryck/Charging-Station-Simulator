@@ -109,3 +109,49 @@ def test_seeded_random_session_is_reproducible():
     a.randomize(); b.randomize()
     assert [(c.mode, c.starting_current, c.target_kwh) for c in a.chargers] == \
            [(c.mode, c.starting_current, c.target_kwh) for c in b.chargers]
+
+
+def test_bulk_random_targets_do_not_restart_or_change_active_sessions():
+    p = Parking(count=4, seed=7)
+    p.chargers[0].start()
+    p.tick(1)
+    old_target = p.chargers[0].target_kwh
+    old_energy = p.chargers[0].delivered_kwh
+    p.randomize_targets(minimum_kwh=20, maximum_kwh=30)
+    assert p.chargers[0].target_kwh == old_target
+    assert p.chargers[0].delivered_kwh == old_energy
+    assert all(20 <= c.target_kwh <= 30 for c in p.chargers[1:])
+    assert all(c.state == "idle" for c in p.chargers[1:])
+
+
+def test_taper_spans_simulated_twenty_minutes_and_respects_minimum():
+    p = Parking(count=1, multiplier=20, limits=dict.fromkeys(("l1", "l2", "l3"), 100))
+    c = p.chargers[0]
+    c.hardware_min = 7
+    c.target_kwh = 2
+    assert c.start()
+    currents = []
+    for _ in range(500):
+        p.tick(.5)
+        if c.tapering:
+            currents.append(c.actual)
+        if c.state == "complete":
+            break
+    assert currents
+    assert max(currents) > min(currents) + 3
+    assert c.delivered_kwh == c.target_kwh
+    assert c.state == "complete"
+    assert c._taper_elapsed >= 60  # Accelerated simulated time, not wall time.
+
+
+def test_external_setpoint_is_not_rewritten_by_battery_taper():
+    p = Parking(count=1, multiplier=10, limits=dict.fromkeys(("l1", "l2", "l3"), 100))
+    c = p.chargers[0]
+    c.hardware_min = 12
+    c.target_kwh = 1
+    c.start()
+    for _ in range(30):
+        p.tick(.5)
+    assert c.tapering
+    assert c.setpoint == 16
+    assert c._taper_current(1200) == 12

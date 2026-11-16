@@ -117,6 +117,9 @@
       },
       "load_scenario": {
         "name": "Load scenario"
+      },
+      "randomize_targets": {
+        "name": "Randomize all charger energy targets"
       }
     }
   }

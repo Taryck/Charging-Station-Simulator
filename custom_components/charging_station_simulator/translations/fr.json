@@ -117,6 +117,9 @@
       },
       "load_scenario": {
         "name": "Charger le scénario"
+      },
+      "randomize_targets": {
+        "name": "Générer les énergies cibles aléatoires"
       }
     }
   }

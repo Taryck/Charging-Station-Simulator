@@ -60,7 +60,9 @@ class StatusSensor(SimEntity, SensorEntity):
                 "session_initial_current_a": c.starting_current if c.state != "idle" else None,
                 "setpoint_a": c.setpoint, "physical_current_a": round(c.actual, 3),
                 "hardware_min_a": c.hardware_min, "hardware_max_a": c.hardware_max,
-                "target_kwh": c.target_kwh, "delivered_kwh": round(c.delivered_kwh, 4)}
+                "target_kwh": c.target_kwh, "delivered_kwh": round(c.delivered_kwh, 4),
+                "tapering": c.tapering,
+                "taper_elapsed_simulated_s": round(c._taper_elapsed or 0, 1)}
 
 
 class ParkingStatus(SimEntity, SensorEntity):
