@@ -20,6 +20,16 @@
   "options": {
     "step": {
       "init": {
+        "title": "Options du simulateur",
+        "menu_options": {
+          "settings": "Modifier les paramètres du parking",
+          "sync": "Synchroniser avec Pilotage recharge VE"
+        },
+        "menu_option_descriptions": {
+          "sync": "Créer ou actualiser uniquement l'installation de test et ses bornes virtuelles."
+        }
+      },
+      "settings": {
         "title": "Modifier le parking simulé",
         "data": {
           "name": "Nom du parking",
@@ -31,7 +41,19 @@
           "limit_l2": "Seuil de courant L2 (A)",
           "limit_l3": "Seuil de courant L3 (A)"
         }
+      },
+      "sync": {
+        "title": "Synchronisation du parking simulé",
+        "description": "Parking : {parking}. {count} bornes virtuelles seront créées ou mises à jour dans une configuration dédiée du module Pilotage recharge VE. Les configurations physiques ne seront jamais modifiées. Les bornes absentes de ce lot ne sont pas supprimées.",
+        "data": {
+          "confirm": "Je confirme la création ou la mise à jour de l'installation de test."
+        }
       }
+    },
+    "error": {
+      "manager_missing": "L'intégration Pilotage recharge VE est introuvable. Installe-la d'abord.",
+      "entities_missing": "Certaines entités virtuelles ne sont pas encore enregistrées dans Home Assistant.",
+      "sync_failed": "La synchronisation a échoué. Consulte les journaux Home Assistant."
     }
   },
   "entity": {
