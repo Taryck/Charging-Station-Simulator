@@ -5,6 +5,7 @@ small fakes. These tests never write to a physical configuration entry.
 """
 from __future__ import annotations
 
+import asyncio
 import importlib.util
 from pathlib import Path
 import sys
@@ -107,8 +108,7 @@ def test_missing_registry_entity_prevents_partial_import(monkeypatch):
         module.build_import_data(object(), entry)
 
 
-@pytest.mark.asyncio
-async def test_manager_flow_creation_and_update_are_accepted(monkeypatch):
+def test_manager_flow_creation_and_update_are_accepted(monkeypatch):
     module, registry, _ = load_adapter(monkeypatch)
     for response in (
         {"type": "create_entry"},
@@ -123,12 +123,11 @@ async def test_manager_flow_creation_and_update_are_accepted(monkeypatch):
         hass = SimpleNamespace(config_entries=SimpleNamespace(
             flow=SimpleNamespace(async_init=async_init)
         ))
-        await module.async_import_into_manager(hass, {"test": 1})
+        asyncio.run(module.async_import_into_manager(hass, {"test": 1}))
         assert calls == [("ev_load_manager", {"source": "import"}, {"test": 1})]
 
 
-@pytest.mark.asyncio
-async def test_manager_rejected_import_is_not_reported_as_success(monkeypatch):
+def test_manager_rejected_import_is_not_reported_as_success(monkeypatch):
     module, _, error = load_adapter(monkeypatch)
 
     async def async_init(domain, context, data):
@@ -138,4 +137,4 @@ async def test_manager_rejected_import_is_not_reported_as_success(monkeypatch):
         flow=SimpleNamespace(async_init=async_init)
     ))
     with pytest.raises(error):
-        await module.async_import_into_manager(hass, {"test": 1})
+        asyncio.run(module.async_import_into_manager(hass, {"test": 1}))
