@@ -20,6 +20,16 @@
   "options": {
     "step": {
       "init": {
+        "title": "Simulator options",
+        "menu_options": {
+          "settings": "Edit parking settings",
+          "sync": "Synchronize with EV Load Manager"
+        },
+        "menu_option_descriptions": {
+          "sync": "Create or update only the test installation and its virtual chargers."
+        }
+      },
+      "settings": {
         "title": "Modify simulated parking",
         "data": {
           "name": "Parking name",
@@ -31,7 +41,19 @@
           "limit_l2": "Phase L2 current limit (A)",
           "limit_l3": "Phase L3 current limit (A)"
         }
+      },
+      "sync": {
+        "title": "Synchronize simulated parking",
+        "description": "Parking: {parking}. {count} virtual chargers will be created or updated in a dedicated EV Load Manager test installation. Physical configurations are never modified. Missing chargers are not automatically deleted.",
+        "data": {
+          "confirm": "I confirm creation or update of the test installation."
+        }
       }
+    },
+    "error": {
+      "manager_missing": "EV Load Manager is not installed.",
+      "entities_missing": "Some virtual entities are not registered yet in Home Assistant.",
+      "sync_failed": "Synchronization failed. Check Home Assistant logs."
     }
   },
   "entity": {
