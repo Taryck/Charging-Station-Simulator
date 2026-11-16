@@ -6,6 +6,7 @@ import random
 
 PHASES = ("l1", "l2", "l3")
 MODES = ("tri", "l1", "l2", "l3")
+TAPER_DURATION_S = 20 * 60  # Simulated seconds, scaled by Parking.multiplier
 
 
 @dataclass
@@ -21,6 +22,7 @@ class Charger:
     delivered_kwh: float = 0.0
     state: str = "idle"
     jitter: dict[str, float] = field(default_factory=lambda: dict.fromkeys(PHASES, 0.0))
+    _taper_elapsed: float | None = None
     _stop_initial: float = 0.0
     _stop_remaining: float = 0.0
 
@@ -37,6 +39,7 @@ class Charger:
         self.actual = 0.0
         self.delivered_kwh = 0.0
         self._stop_remaining = 0.0
+        self._taper_elapsed = None
         self.state = "charging"
         return True
 
@@ -58,11 +61,44 @@ class Charger:
                     if self.actual > 0 and p in self.active_phases else 0.0)
                 for p in PHASES}
 
+    @property
+    def tapering(self) -> bool:
+        return self.state == "charging" and self._taper_elapsed is not None
+
+    def _taper_current(self, elapsed: float) -> float:
+        """EV-style taper: a rapid first drop, followed by a slow tail.
+
+        The simulated battery may reduce its draw without rewriting the
+        externally requested current setpoint. Never go below hardware_min.
+        """
+        fraction = min(1.0, max(0.0, elapsed / TAPER_DURATION_S))
+        # From the starting reference down to ~half, then slowly to the floor.
+        reference = max(self.hardware_min, self.setpoint)
+        knee = max(self.hardware_min, reference * 0.52)
+        if fraction < 0.15:
+            return reference + (knee - reference) * fraction / 0.15
+        return knee + (self.hardware_min - knee) * (fraction - 0.15) / 0.85
+
+    def _taper_energy_kwh(self) -> float:
+        """Energy expected over a 20-minute taper at the present setpoint."""
+        reference = max(self.hardware_min, self.setpoint)
+        knee = max(self.hardware_min, reference * 0.52)
+        # Integral of two linear segments, weighted by their durations.
+        avg_a = 0.15 * (reference + knee) / 2 + 0.85 * (knee + self.hardware_min) / 2
+        return 230.0 * len(self.active_phases) * avg_a * TAPER_DURATION_S / 3_600_000
+
     def tick(self, dt: float, time_factor: float, rng: random.Random) -> None:
         if dt <= 0:
             return
         if self.state == "charging":
-            self.actual += min(abs(self.setpoint - self.actual), rng.uniform(1, 2) * dt) * (1 if self.setpoint > self.actual else -1)
+            if (self._taper_elapsed is None
+                    and self.target_kwh - self.delivered_kwh <= self._taper_energy_kwh()):
+                self._taper_elapsed = 0.0
+            desired = self.setpoint
+            if self._taper_elapsed is not None:
+                desired = min(self.setpoint, self._taper_current(self._taper_elapsed))
+                self._taper_elapsed += dt * time_factor
+            self.actual += min(abs(desired - self.actual), rng.uniform(1, 2) * dt) * (1 if desired > self.actual else -1)
         elif self.state == "stopping":
             self._stop_remaining = max(0.0, self._stop_remaining - dt)
             self.actual = self._stop_initial * self._stop_remaining / 2.0
@@ -131,6 +167,14 @@ class Parking:
     def reset_trip(self) -> None:
         self.tripped = False
         self.overload_elapsed = 0.0
+
+    def randomize_targets(self, *, minimum_kwh: float = 5, maximum_kwh: float = 40) -> None:
+        """Generate per-charger energy requests without touching active sessions."""
+        if minimum_kwh <= 0 or minimum_kwh > maximum_kwh:
+            raise ValueError("Invalid energy range")
+        for c in self.chargers:
+            if c.state not in ("charging", "stopping"):
+                c.target_kwh = round(self.rng.uniform(minimum_kwh, maximum_kwh), 2)
 
     def randomize(self, *, minimum_kwh: float = 5, maximum_kwh: float = 40) -> None:
         if minimum_kwh <= 0 or minimum_kwh > maximum_kwh:

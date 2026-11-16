@@ -37,6 +37,8 @@ class ParkingAction(SimEntity, ButtonEntity):
                 raise HomeAssistantError("Parking circuit breaker is tripped")
             for c in parking.chargers:
                 c.start()
+        elif self.action == "randomize_targets":
+            parking.randomize_targets()
         elif self.action == "load_scenario":
             if parking.tripped:
                 raise HomeAssistantError("Reset trip before starting a new scenario")
@@ -53,6 +55,6 @@ class ParkingAction(SimEntity, ButtonEntity):
 async def async_setup_entry(hass, entry, async_add_entities):
     runtime = entry.runtime_data
     entities = [ParkingAction(runtime, action) for action in
-                ("start_all", "stop_all", "reset_trip", "load_scenario")]
+                ("start_all", "stop_all", "reset_trip", "load_scenario", "randomize_targets")]
     entities.extend(ChargerStart(runtime, c) for c in runtime.parking.chargers)
     async_add_entities(entities)

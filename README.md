@@ -79,3 +79,12 @@ avant même de commencer le test, ajuster d'abord les seuils du simulateur et
 la durée de dépassement.
 
 Tests associés : `tests/test_synchronization.py`.
+
+
+## Énergie cible, tirage aléatoire et fin de charge / Energy targets and taper
+
+Chaque borne possède une cible individuelle en kWh (`number.ev_sim_borne_XX_target_kwh`) et un seuil matériel minimal en ampères (`number.ev_sim_borne_XX_hardware_min`). Le bouton `button.ev_sim_parking_randomize_targets` tire une nouvelle cible aléatoire **entre 5 et 40 kWh** pour chaque borne inactive, sans démarrer de session ni modifier les bornes en charge. Le scénario `random` continue à générer des sessions complètes.
+
+À l'approche de la cible, la borne réduit automatiquement son courant suivant un profil en deux étapes : baisse rapide pendant les 3 premières minutes, puis queue lente sur les 17 minutes suivantes (**20 minutes simulées**, divisées par `time_factor` en temps réel). Le début de réduction est estimé à partir de l'énergie restante et de l'intégrale du profil ; l'arrêt se fait lorsque l'énergie cible est atteinte. La puissance du véhicule ne descend pas sous son minimum matériel avant l'arrêt ; le temps réel nécessaire à la variation physique (1–2 A/s) reste inchangé. En cas de variation de consigne externe ou de cible très faible, la durée réelle de la fin de charge peut différer de 20 minutes. Le profil ne modifie jamais la consigne externe. Les attributs `tapering` et `taper_elapsed_simulated_s` sont visibles sur le capteur d'état de chaque borne.
+
+Each charger has its own target in kWh and its own hardware current minimum in A. Use `button.ev_sim_parking_randomize_targets` to regenerate targets between 5 and 40 kWh for idle chargers without restarting sessions. Near completion, current follows a two-stage taper in simulated time, with an initial fast drop and a slow tail. The external current setpoint is preserved; the hardware minimum remains enforced. Charging ends when the target energy is reached.
