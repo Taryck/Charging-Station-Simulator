@@ -46,3 +46,36 @@ Pour une configuration pilotage avec borne 01 : utiliser les capteurs `sensor.ev
 `python -m pip install pytest && python -m pytest -q tests`
 
 L’intégration et les tests unitaires ne remplacent pas une validation du chargement dans une véritable instance Home Assistant. Les paramètres actuels de simulation ne sont pas persistés après redémarrage : ils sont recréés à partir de la configuration de l'intégration.
+## Synchronisation automatique avec Pilotage recharge VE (v0.2.0)
+
+Installer **les deux intégrations** à jour sur la même instance Home Assistant :
+- [Charging Station Simulator](https://github.com/Taryck/Charging-Station-Simulator), version 0.2.0 ou supérieure ;
+- [Pilotage recharge VE](https://github.com/Taryck/Pilotage-recharge-ve), version 0.2.1 ou supérieure.
+
+Ensuite, ouvrir **Paramètres → Appareils et services → Charging Station Simulator →
+Configurer → Synchroniser avec Pilotage recharge VE**.
+
+L'écran présente :
+- Le parking et le nombre de bornes ;
+- Les entités réelles du **compteur virtuel** L1, L2 et L3 ;
+- Le nombre de bornes virtuelles à ajouter et à actualiser.
+
+Cocher la confirmation pour lancer la synchronisation. Il n'y a aucune écriture
+dans les fichiers `.storage` : la configuration passe par les API de Home
+Assistant, avec une nouvelle entrée de pilotage identifiée comme *simulation*.
+Les installations physiques ne sont jamais sélectionnées ni écrasées.
+
+Une nouvelle synchronisation est possible après une modification du nombre de bornes
+ou des paramètres du simulateur : les bornes déjà créées sont actualisées en
+conservant leur identifiant stable ; les nouvelles sont ajoutées. Aucune borne
+absente n'est supprimée automatiquement.
+
+Le régulateur obtient les entités du registre HA, pas des IDs reconstruits :
+cela fonctionne même si un utilisateur a renommé ses entités.
+
+**Effet attendu :** l'intégration de pilotage peut agir sur les consignes
+virtuelles dès la première synchronisation. Pour éviter une coupure virtuelle
+avant même de commencer le test, ajuster d'abord les seuils du simulateur et
+la durée de dépassement.
+
+Tests associés : `tests/test_synchronization.py`.
