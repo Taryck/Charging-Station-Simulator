@@ -82,6 +82,20 @@ class ChargingStationSimulatorOptionsFlow(config_entries.OptionsFlow):
                     title="", data=dict(self.config_entry.options)
                 )
 
+        existing = next(
+            (e for e in self.hass.config_entries.async_entries("ev_load_manager")
+             if e.data.get("simulator_entry_id") == self.config_entry.entry_id),
+            None,
+        )
+        existing_keys = (
+            {s.unique_id for s in existing.subentries.values()}
+            if existing else set()
+        )
+        new_count = (
+            sum(1 for item in payload["simulator_chargers"]
+                if item["simulator_key"] not in existing_keys)
+            if payload else 0
+        )
         return self.async_show_form(
             step_id="sync",
             data_schema=vol.Schema({
@@ -92,5 +106,10 @@ class ChargingStationSimulatorOptionsFlow(config_entries.OptionsFlow):
             description_placeholders={
                 "count": str(self.config_entry.runtime_data.parking.count),
                 "parking": self.config_entry.title,
+                "new_count": str(new_count),
+                "updated_count": str(len(payload["simulator_chargers"]) - new_count) if payload else "0",
+                "meter_l1": payload["current_l1"] if payload else "—",
+                "meter_l2": payload["current_l2"] if payload else "—",
+                "meter_l3": payload["current_l3"] if payload else "—",
             },
         )
