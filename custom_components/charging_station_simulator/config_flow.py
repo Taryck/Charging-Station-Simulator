@@ -40,8 +40,57 @@ class ChargingStationSimulatorConfigFlow(config_entries.ConfigFlow, domain=DOMAI
 
 
 class ChargingStationSimulatorOptionsFlow(config_entries.OptionsFlow):
+    """Change simulator settings or explicitly synchronize with EV load manager."""
+
     async def async_step_init(self, user_input=None):
+        return self.async_show_menu(step_id="init", menu_options=["settings", "sync"])
+
+    async def async_step_settings(self, user_input=None):
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)
         data = {**self.config_entry.data, **self.config_entry.options}
-        return self.async_show_form(step_id="init", data_schema=_schema(data))
+        return self.async_show_form(step_id="settings", data_schema=_schema(data))
+
+    async def async_step_sync(self, user_input=None):
+        """Preview and require explicit confirmation of the test import."""
+        from homeassistant.exceptions import HomeAssistantError
+        from homeassistant.loader import IntegrationNotFound, async_get_integration
+
+        from .synchronization import build_import_data, async_import_into_manager
+
+        errors = {}
+        try:
+            await async_get_integration(self.hass, "ev_load_manager")
+        except IntegrationNotFound:
+            errors["base"] = "manager_missing"
+
+        payload = None
+        if not errors:
+            try:
+                payload = build_import_data(self.hass, self.config_entry)
+            except HomeAssistantError:
+                errors["base"] = "entities_missing"
+
+        if user_input is not None and user_input.get("confirm") and not errors:
+            try:
+                await async_import_into_manager(self.hass, payload)
+            except (HomeAssistantError, ValueError, KeyError):
+                errors["base"] = "sync_failed"
+            else:
+                # Do not alter simulator settings when synchronizing.
+                return self.async_create_entry(
+                    title="", data=dict(self.config_entry.options)
+                )
+
+        return self.async_show_form(
+            step_id="sync",
+            data_schema=vol.Schema({
+                vol.Required("confirm", default=False):
+                    selector.BooleanSelector(),
+            }),
+            errors=errors,
+            description_placeholders={
+                "count": str(self.config_entry.runtime_data.parking.count),
+                "parking": self.config_entry.title,
+            },
+        )
